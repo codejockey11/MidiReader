@@ -1,0 +1,39 @@
+MIDI Events
+Musical control information such as playing a note or adjusting a MIDI channel's modulation value are defined by MIDI Channel Events. Each MIDI Channel Event consists of a variable-length delta time (like all track events) and a two or three byte description which determines the MIDI channel it corresponds to, the type of event it is and one or two event type specific values. Below is a detailed description of each type of MIDI event and how it is used.
+
+Note Off Event
+0x8c noteNumber, velocity
+
+The Note Off Event is used to signal when a MIDI key is released. These events have two parameters identical to a Note On event. The note number specifies which of the 128 MIDI keys is being played and the velocity determines how fast/hard the key was released. The note number is normally used to specify which previously pressed key is being released and the velocity is usually ignored, but is sometimes used to adjust the slope of an instrument's release phase.
+
+Note On Event
+0x9c noteNumber, velocity
+
+The Note On Event is used to signal when a MIDI key is pressed. This type of event has two parameters. The note number that specifies which of the 128 MIDI keys is being played and the velocity determines how fast/hard the key is pressed. The note number is normally used to specify the instruments musical pitch and the velocity is usually used to specify the instruments playback volume and intensity.
+
+Note Aftertouch Event
+0xAc noteNumber, amount
+
+The Note Aftertouch Event is used to indicate a pressure change on one of the currently pressed MIDI keys. It has two parameters. The note number of which key's pressure is changing and the aftertouch value which specifies amount of pressure being applied (0 = no pressure, 127 = full pressure). Note Aftertouch is used for extra expression of particular notes, often introducing or increasing some type of modulation during the instrument's sustain phase
+
+Controller Event
+0xBc controllernumber, value
+
+The Controller Event signals the change in a MIDI channels state. There are 128 controllers which define different attributes of the channel including volume, pan, modulation, effects, and more. This event type has two parameters. The controller number specifies which control is changing and the controller value defines it's new setting.
+
+Click here for a list of the defined MIDI controller types.
+
+Program Change Event
+0xCc programNumber
+
+The Program Change Event is used to change which program (instrument/patch) should be played on the MIDI channel. This type of event takes only one parameter, the program number of the new instrument/patch.
+
+Channel Aftertouch Event
+0xDc amount
+
+The Channel Aftertouch Event is similar to the Note Aftertouch message, except it effects all keys currently pressed on the specific MIDI channel. This type of event takes only one parameter, the aftertouch amount (0 = no pressure, 127 = full pressure).
+
+Pitch Bend Event
+0XEc value LSB, value MSB
+
+The Pitch Bend Event is similar to a controller event, except that it is a unique MIDI Channel Event that has two bytes to describe it's value. The pitch value is defined by both parameters of the MIDI Channel Event by joining them in the format of yyyyyyyxxxxxxx where the y characters represent the last 7 bits of the second parameter and the x characters represent the last 7 bits of the first parameter. The combining of both parameters enables high accuracy values (0 - 16383). The pitch value affects all playing notes on the current channel. Values below 8192 decrease the pitch, while values above 8192 increase the pitch. The pitch range may vary from instrument to instrument, but is usually +/-2 semi-tones.

@@ -1,0 +1,116 @@
+Karaoke Formats
+Soft Karaoke
+The .kar format was originally developed by Tune 1000 for a commercial product (Soft Karaoke, 1993).
+
+The format has some advantages, it contains fields started by @ to enter title author, language that can be easily used by midi karaoke players (standard midi files have not these important text fields, therefore it is not standardized how to enter this information into midi files), it contains simple format characters to break paragraphs and lines (but has bad hidden limitation of max 4 lines per paragraph).The reason for using text meta events instead of lyrics is not clear, there is no advantage,probably was a mistake by format developer.
+
+The format was good but had only one problem for use with keyboards, it was in midi format 1 and many keyboards only support format 0 midi. Therefore Tune1000 developed new format in format 0.
+
+Structure of a typical karaoke (.kar) file:
+The first track contains text events that are used to make the file recognizable by Karaoke program as a MIDI Karaoke file. @KMIDI KARAOKE FILE is used to for that purpose. @V0100 is the program version number. Anything starting with @I is any information you want to include in the file.
+
+The second track contains the text events for the lyrics of the song. The first event is @LENGL. It identifies the language the words are in, which is English. The next couple of events start with @T which identifies the title of the songs. You can have up to three events like these. The text of those events will show up in the upper right corner of the Soft Karaoke program window.
+
+The rest of the track contains the words of the song. Each event is the syllable that is supposed to be sung at the time of the event. If the text starts with \, it means to clear the screen and show the words at the top of the screen. If the text starts with /, it means to go to the next line.
+
+Some karaoke programs extract part of this 'header' information. It is a good idea to put the song title on the first @T line, and to put the artist on the second @T line. This way these programs will display the information in the 'Title' and 'Artist' columns in their directory window.
+
+@ tags summary:
+@K Type of file / copyright information. Example @KMIDI KARAOKE FILE
+@L language of the song. Example @LENGL
+@T Title of song, artist, sequencer (SEQ), ... Examples @TTrue Love @TBing Crosby
+@I other information.
+Tune1000
+Developed by Tune 1000, and also used by Roland for its arrangers (E500, E96, RA800, E68, G800 et G1000), by Technics (KN5000 for example) and some Farfisa keyboards. It is defined as the professional MIDI format. The MIDI file must in format 0, the single track MIDI format. Words are broken down into separate syllables and stored as lyric meta events at the given time they are intended to be sung.
+
+<Syllable>
+The SMF-defined Lyric meta-event is used.
+Each syllable is a single Lyric meta-event.
+Add a single-byte space “ ” after the last syllable of a word.
+Add a single-byte space “ ” after the punctuation mark of the last syllable that has a punctuation mark.
+FF 05 len "text"
+
+Example:
+
+FF 05 len "This "
+FF 05 len "is "
+FF 05 len "an "
+FF 05 len "ex"
+FF 05 len "am"
+FF 05 len "ple. "
+
+<Carriage Return Event>
+This is a special event which indicates the end of a line when the lyrics are displayed on screen etc.
+When this event occurs, a new line is begun in the lyrics display.
+FF 05 01 0D
+
+<Line Feed Event>
+This is a special event which indicates the end of a paragraph for the displayed lyrics.
+This event will clear the screen in order to display the following paragraph.
+FF 05 01 0A
+
+<Chord>
+Text meta events with the "%" prefix are used to store chords using the standard notation format <A#m7/E> where the first letter is the chord name (capitals letters A-G) , the second is the alteration (#, b or blank), followed by the chord description.
+
+Example:
+
+FF 01 len "%D#/F"
+FF 01 len "%B m7" <-- recommended blank space if no prefix (QMidi will check this!)
+FF 01 len "%Gbsus4"
+	CAUTION: Sometimes chords are stored without the % prefix but it may be harder for players to recognize them properly, because text meta event are also used to store lyrics in the SoftKaraoke format.	 
+Solton
+Developed by the Keytron laboratories for Solton and used by some italian MIDI manufacturers (like Charlie Lab's Megabeat One).
+
+The lyric meta event is used to store data and some tags are used to specify the kind of event. The < tag precedes a lyrics line and % precedes chords. The Solton sequencer displays the lyrics in the first line and the chord in the second line of its display. The MIDI controller number 31 ($1F) is sent on channel 1 and tells the Solton sequencer to hilite a number of characters specified by the its value. The controller value 0 unhilites all.
+
+Example:
+
+FF 05 len "<THIS IS AN EXAMPLE"
+FF 05 len "%Emin"
+B0 1F 04 <-- THIS hilited
+B0 1F 07 <-- THIS IS hilited
+B0 1F 0A <-- THIS IS AN hilited
+B0 1F 10 <-- all text hilited
+B0 1F 00 <-- unhilite all
+FF 05 len "<THE END" <-- next line
+FF 05 len "%Amin"
+
+MidiSoft
+The Midisoft format is supported by Charlie Lab's Megabeat One and some other Roland keyboards (G800, G1000). Lyrics and chords are stored as system exclusive messages with manufacturer ID 0x002024. Lyrics are sent by groups of 4 lines of text and special sysex message are sent in sync with the song to handle hilighting. Special tag numbers are defined for every kind of message.
+
+<00 04> 1° line of lyrics
+<00 05> 2° line of lyrics
+<00 06> 3° line of lyrics
+<00 07> 4° line of lyrics
+Example:
+
+FO len 00 20 24 00 04 "THIS IS AN EXAMPLE" F7
+FO len 00 20 24 00 05 "2° LINE" F7
+FO len 00 20 24 00 06 "3° LINE" F7
+FO len 00 20 24 00 07 "4° LINE" F7
+<00 08> Sync
+Example:
+
+FO len 00 20 24 00 08 F7 <-- 1° line is hilighted
+FO len 00 20 24 00 08 F7 <-- 2° line is hilighted
+FO len 00 20 24 00 08 F7 <-- 3° line is hilighted
+FO len 00 20 24 00 08 F7 <-- 4° line is hilighted
+<00 01> Chord
+Example:
+
+FO len 00 20 24 00 01 "Amin" F7
+
+Yamaha
+Chords can also be stored as Yamaha XF format "Chord Control Code" sysexes. MidiKit allows you to view and edit these messages using the following syntax:
+
+NOTE (C, D, E, F, G, A, B)
+
+ACCIDENTAL (b, #)
+
+CHORD TYPE
+
+maj6	maj7	maj7(#11)	maj(9)	maj7(9)	maj6(9)	aug	 	 
+m	m6	m7	m7b5	m(9)	m7(9)	m7(11)	minmaj7	minmaj7(9)
+dim	dim7	 	 	 	 	 	 	 
+7	7sus4	7b5	7(9)	7(#11)	7(13)	7(b9)	7(b13)	7(#9)
+maj7aug	7aug	1+8	1+5	sus4	1+2+5	 	 	 

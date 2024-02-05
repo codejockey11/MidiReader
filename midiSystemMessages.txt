@@ -1,0 +1,52 @@
+System Messages
+MIDI System Messages are classified as being System Common Messages, System Real Time Messages, or System Exclusive Messages. System Common messages are intended for all receivers in the system. System Real Time messages are used for synchronization between clock-based MIDI components. System Exclusive messages include a Manufacturer's Identification (ID) code, and are used to transfer any number of data bytes in a format specified by the referenced manufacturer.
+
+System Common Messages
+The System Common Messages which are currently defined include MTC Quarter Frame, Song Select, Song Position Pointer, Tune Request, and End Of Exclusive (EOX). The MTC Quarter Frame message is part of the MIDI Time Code information used for synchronization of MIDI equipment and other equipment, such as audio or video tape machines.
+
+Song Select
+0xF3
+
+The Song Select message is used with MIDI equipment, such as sequencers or drum machines, which can store and recall a number of different songs. The Song Position Pointer is used to set a sequencer to start playback of a song at some point other than at the beginning. The Song Position Pointer value is related to the number of MIDI clocks which would have elapsed between the beginning of the song and the desired point in the song. This message can only be used with equipment which recognizes MIDI System Real Time Messages (MIDI Sync).
+
+Tune Request
+0xF6
+
+The Tune Request message is generally used to request an analog synthesizer to retune its' internal oscillators. This message is generally not needed with digital synthesizers.
+
+EOX
+0xF7
+
+The EOX message is used to flag the end of a System Exclusive message, which can include a variable number of data bytes.
+
+System Real Time Messages
+The MIDI System Real Time messages are used to synchronize all of the MIDI clock-based equipment within a system, such as sequencers and drum machines. Most of the System Real Time messages are normally ignored by keyboard instruments and synthesizers. To help ensure accurate timing, System Real Time messages are given priority over other messages, and these single-byte messages may occur anywhere in the data stream (a Real Time message may appear between the status byte and data byte of some other MIDI message).
+
+MIDI Clock
+0xF8
+
+The System Real Time messages are the Timing Clock, Start, Continue, Stop, Active Sensing, and the System Reset message. The Timing Clock message is the master clock which sets the tempo for playback of a sequence. The Timing Clock message is sent 24 times per quarter note. The Start, Continue, and Stop messages are used to control playback of the sequence.
+
+Start
+0xFA
+
+Continue
+0xFB
+
+Stop
+0xFC
+
+Active Sensing
+0xFE
+
+The Active Sensing signal is used to help eliminate "stuck notes" which may occur if a MIDI cable is disconnected during playback of a MIDI sequence. Without Active Sensing, if a cable is disconnected during playback, then some notes may be left playing indefinitely because they have been activated by a Note On message, but the corresponding Note Off message will never be received.
+
+System Reset
+0xFF
+
+The System Reset message, as the name implies, is used to reset and initialize any equipment which receives the message. This message is generally not sent automatically by transmitting devices, and must be initiated manually by a user.
+
+System Exclusive Messages
+0xF0 id data EOX
+
+Also known as SysEx Events, these MIDI events are used to control MIDI hardware or software that require special data bytes that will follow their manufacturer's specifications. Every SysEx event includes an ID that specifies which manufacturer's product is to be the intended receiver (see the MIDI Manufacturers List). All other products will ignore the event. There are three types of SysEx messages which are used to send data in a single event, across multiple events or authorize the transmission of specific MIDI messages.
